@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Data Structures Playground</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--text:#1a1f2b;--muted:#4b5367;--accent:#3346d3;--on-accent:#fff;--border:#c9d0e0;--hl:#fde68a;--hl-text:#3b2f00;--ok:#bbf7d0;--ok-text:#064e2b;--bad:#fecaca;--bad-text:#7a1212;--slot:#eef1f9;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151d;--card:#1b2030;--text:#eef0f6;--muted:#b4bbcf;--accent:#8c9bff;--on-accent:#10142a;--border:#3a4260;--hl:#6b5a0e;--hl-text:#fff4c2;--ok:#14532d;--ok-text:#d3fbe2;--bad:#7f1d1d;--bad-text:#ffe0e0;--slot:#232a40;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12151d;--card:#1b2030;--text:#eef0f6;--muted:#b4bbcf;--accent:#8c9bff;--on-accent:#10142a;--border:#3a4260;--hl:#6b5a0e;--hl-text:#fff4c2;--ok:#14532d;--ok-text:#d3fbe2;--bad:#7f1d1d;--bad-text:#ffe0e0;--slot:#232a40;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:920px;margin:0 auto;padding:16px}
+h1{font-size:1.6rem;margin:8px 0 4px}h2{margin:0 0 6px;font-size:1.3rem}h3{font-size:1rem;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 16px}
+[role=tablist]{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+[role=tab]{flex:1 1 auto;min-height:44px;padding:8px 14px;border:2px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+[role=tab][aria-selected=true]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+section.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+section[hidden]{display:none}
+.explain{background:var(--slot);border-radius:10px;padding:10px 12px;margin:0 0 14px}
+.explain p{margin:0 0 6px}.explain p:last-child{margin:0}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+label{font-weight:600}
+input,select{min-height:44px;padding:6px 10px;border:2px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font:inherit;width:9.5em}
+select{width:auto}
+button.b{min-height:44px;padding:8px 14px;border:2px solid var(--accent);background:var(--accent);color:var(--on-accent);border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+button.b.alt{background:transparent;color:var(--accent)}
+button.b:disabled{opacity:.5;cursor:not-allowed}
+.msg{min-height:1.6em;margin:4px 0 12px;font-weight:600}
+.msg.warn{color:var(--bad-text);background:var(--bad);padding:4px 10px;border-radius:8px}
+.msg.info{color:var(--ok-text);background:var(--ok);padding:4px 10px;border-radius:8px}
+.stage{background:var(--slot);border-radius:12px;padding:14px;margin-bottom:12px;overflow-x:auto}
+.logbox h3{margin-top:4px}
+ul.log{list-style:none;margin:0;padding:0;max-height:180px;overflow:auto;border:1px solid var(--border);border-radius:10px;font-size:.95rem}
+ul.log li{padding:6px 10px;border-bottom:1px solid var(--border)}
+ul.log li:first-child{background:var(--hl);color:var(--hl-text)}
+ul.log li.warn{color:var(--bad-text)}
+.empty{color:var(--muted);font-style:italic}
+/* stack */
+.stackwrap{display:flex;gap:12px;align-items:flex-start;justify-content:center}
+.stack{width:180px;min-height:60px;border:3px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.item{padding:10px;text-align:center;font-weight:700;border-radius:8px;background:var(--accent);color:var(--on-accent);position:relative;min-width:56px}
+.item.top::after{content:"← TOP";position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);color:var(--text);font-size:.8rem;white-space:nowrap}
+.item.peek{background:var(--hl);color:var(--hl-text);outline:3px solid var(--text)}
+.enter{animation:in .4s ease}.leave{animation:out .3s ease forwards}
+@keyframes in{from{opacity:0;transform:translateY(-30px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes out{to{opacity:0;transform:translateY(-30px) scale(.9)}}
+.stackwrap .lbl{color:var(--muted);font-size:.9rem;padding-top:8px;max-width:9em}
+/* queue */
+.queue{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;min-height:90px;padding:6px 0}
+.qi{display:flex;flex-direction:column;align-items:center;gap:4px}
+.qi small{font-weight:700;min-height:1.2em;font-size:.8rem}
+.qi .item{min-width:60px}
+.dir{color:var(--muted);font-size:.9rem;margin-top:6px}
+/* hanoi */
+.pegs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.peg{position:relative;height:240px;display:flex;flex-direction:column-reverse;align-items:center;padding-bottom:26px;border-bottom:6px solid var(--border)}
+.peg::before{content:"";position:absolute;bottom:0;top:10px;width:8px;background:var(--border);border-radius:4px}
+.peg b{position:absolute;bottom:-1px;left:0;right:0;text-align:center;font-size:.9rem;transform:translateY(24px)}
+.disk{position:relative;height:24px;margin-top:2px;border-radius:7px;color:#111;font-weight:700;font-size:.85rem;text-align:center;line-height:24px;border:2px solid rgba(0,0,0,.35)}
+.disk.moved{outline:3px solid var(--text);animation:in .4s ease}
+.stats{display:flex;gap:16px;flex-wrap:wrap;font-weight:700;margin-bottom:6px}
+.rules{margin:4px 0 0;padding-left:1.2em}
+/* list */
+.ll{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:90px;padding-top:18px}
+.n{position:relative;display:flex;align-items:center}
+.n .box{min-width:64px;padding:10px 12px;text-align:center;font-weight:700;border-radius:8px;background:var(--accent);color:var(--on-accent);border:3px solid transparent}
+.n .box.cur{background:var(--hl);color:var(--hl-text);border-color:var(--text)}
+.n .box.found{background:var(--ok);color:var(--ok-text);border-color:var(--text)}
+.n .box.gone{background:var(--bad);color:var(--bad-text)}
+.n .tag{position:absolute;top:-20px;left:0;font-size:.75rem;font-weight:700}
+.arrow{font-size:1.5rem;color:var(--muted)}
+.null{font-weight:700;color:var(--muted);border:2px dashed var(--border);border-radius:8px;padding:6px 10px}
+@media (max-width:560px){main{padding:10px}.peg{height:200px}.disk{font-size:.75rem}.item.top::after{display:none}.stack{width:140px}}
+@media (prefers-reduced-motion:reduce){.enter,.leave,.disk.moved{animation:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>Data Structures Playground</h1>
+<p class="sub">Pick a tab, press the buttons, and watch each step appear in the log.</p>
+<div role="tablist" aria-label="Demos">
+<button role="tab" id="t0" aria-controls="p0" aria-selected="true">Stack</button>
+<button role="tab" id="t1" aria-controls="p1" aria-selected="false" tabindex="-1">Queue</button>
+<button role="tab" id="t2" aria-controls="p2" aria-selected="false" tabindex="-1">Tower of Hanoi</button>
+<button role="tab" id="t3" aria-controls="p3" aria-selected="false" tabindex="-1">Linked List</button>
+</div>
+
+<section class="panel" id="p0" role="tabpanel" aria-labelledby="t0">
+<h2>Stack (LIFO)</h2>
+<div class="explain"><p>A stack is like a pile of plates: you only add or remove at the <b>top</b>. The last item in is the first item out (Last In, First Out).</p>
+<p><b>Push</b> adds to the top. <b>Pop</b> removes the top. <b>Peek</b> looks at the top without removing it.</p></div>
+<div class="controls"><label for="sIn">Value</label><input id="sIn" maxlength="4" autocomplete="off" placeholder="e.g. 9">
+<button class="b" id="sPush">Push</button><button class="b" id="sPop">Pop</button><button class="b alt" id="sPeek">Peek</button><button class="b alt" id="sReset">Reset</button></div>
+<div class="msg" id="sMsg" role="status"></div>
+<div class="stage"><div class="stackwrap"><div class="stack" id="stack" aria-label="Stack contents, top first"></div><div class="lbl" id="sSize"></div></div></div>
+<div class="logbox"><h3>Operation log</h3><ul class="log" id="sLog" aria-live="polite"></ul></div>
+</section>
+
+<section class="panel" id="p1" role="tabpanel" aria-labelledby="t1" hidden>
+<h2>Queue (FIFO)</h2>
+<div class="explain"><p>A queue is like a line at a shop: people join at the <b>rear</b> and leave from the <b>front</b>. The first item in is the first item out (First In, First Out).</p>
+<p><b>Enqueue</b> adds at the rear. <b>Dequeue</b> removes from the front.</p></div>
+<div class="controls"><label for="qIn">Value</label><input id="qIn" maxlength="4" autocomplete="off" placeholder="e.g. D">
+<button class="b" id="qEn">Enqueue</button><button class="b" id="qDe">Dequeue</button><button class="b alt" id="qReset">Reset</button></div>
+<div class="msg" id="qMsg" role="status"></div>
+<div class="stage"><div class="queue" id="queue" aria-label="Queue contents, front first"></div><div class="dir">Items leave on the FRONT side (left) and join at the REAR side (right).</div></div>
+<div class="logbox"><h3>Operation log</h3><ul class="log" id="qLog" aria-live="polite"></ul></div>
+</section>
+
+<section class="panel" id="p2" role="tabpanel" aria-labelledby="t2" hidden>
+<h2>Tower of Hanoi</h2>
+<div class="explain"><p>Move the whole tower from peg A to peg C.</p>
+<ol class="rules"><li>Move only one disk at a time.</li><li>Only the top disk of a peg can be moved.</li><li>A larger disk can never sit on a smaller one.</li></ol>
+<p>The best solution needs 2<sup>n</sup> − 1 moves for n disks.</p></div>
+<div class="controls"><label for="hN">Disks</label><select id="hN"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select>
+<label for="hSp">Speed</label><select id="hSp"><option value="1000">Slow</option><option value="550" selected>Normal</option><option value="200">Fast</option></select>
+<button class="b" id="hPlay">Play</button><button class="b alt" id="hStep">Step</button><button class="b alt" id="hReset">Reset</button></div>
+<div class="msg" id="hMsg" role="status"></div>
+<div class="stats"><span>Moves: <span id="hCount">0</span></span><span>Minimum: <span id="hMin">7</span></span></div>
+<div class="stage"><div class="pegs" id="pegs"></div></div>
+<div class="logbox"><h3>Operation log</h3><ul class="log" id="hLog" aria-live="polite"></ul></div>
+</section>
+
+<section class="panel" id="p3" role="tabpanel" aria-labelledby="t3" hidden>
+<h2>Singly Linked List</h2>
+<div class="explain"><p>A linked list is a chain of <b>nodes</b>. Each node holds a value and a link (arrow) to the next node. The <b>HEAD</b> points at the first node and the last node points to <b>null</b> (nothing).</p>
+<p>To find a value you must start at the head and follow the arrows one by one.</p></div>
+<div class="controls"><label for="lIn">Value</label><input id="lIn" maxlength="4" autocomplete="off" placeholder="e.g. 40">
+<button class="b" id="lHead">Add to head</button><button class="b" id="lTail">Add to tail</button><button class="b" id="lDel">Remove</button><button class="b" id="lFind">Search</button><button class="b alt" id="lReset">Reset</button></div>
+<div class="msg" id="lMsg" role="status"></div>
+<div class="stage"><div class="ll" id="ll" aria-label="Linked list"></div></div>
+<div class="logbox"><h3>Operation log</h3><ul class="log" id="lLog" aria-live="polite"></ul></div>
+</section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function Log(id){const el=$(id);let n=0;return{add(m,t){n++;const li=document.createElement("li");if(t)li.className=t;li.textContent=n+". "+m;el.prepend(li);while(el.children.length>60)el.lastChild.remove()},clear(){el.innerHTML="";n=0}}}
+function Msg(id){const el=$(id);return(t,k)=>{el.textContent=t||"";el.className="msg"+(t&&k?" "+k:"")}}
+function readVal(inp,say){const v=inp.value.trim();if(!v){say("Please type a value first (up to 4 characters).","warn");inp.focus();return null}return v}
+
+/* Tabs */
+const tabs=[...document.querySelectorAll("[role=tab]")];
+function pick(i,focus){tabs.forEach((t,j)=>{const on=i===j;t.setAttribute("aria-selected",on);t.tabIndex=on?0:-1;$("#p"+j).hidden=!on});if(focus)tabs[i].focus()}
+tabs.forEach((t,i)=>{t.onclick=()=>pick(i);t.onkeydown=e=>{let j=null;if(e.key==="ArrowRight")j=(i+1)%4;if(e.key==="ArrowLeft")j=(i+3)%4;if(e.key==="Home")j=0;if(e.key==="End")j=3;if(j!==null){e.preventDefault();pick(j,true)}}});
+
+/* ---------- Stack ---------- */
+const sLog=Log("#sLog"),sSay=Msg("#sMsg"),MAXS=7;
+let stk=[];
+function drawStack(enter,peek){const el=$("#stack");el.innerHTML="";if(!stk.length){el.innerHTML='<span class="empty">Empty stack</span>'}
+ for(let i=stk.length-1;i>=0;i--){const d=document.createElement("div");d.className="item"+(i===stk.length-1?" top":"");d.textContent=stk[i];if(enter&&i===stk.length-1)d.classList.add("enter");if(peek&&i===stk.length-1)d.classList.add("peek");el.appendChild(d)}
+ $("#sSize").textContent="Size: "+stk.length+" of "+MAXS}
+function sInit(){stk=["3","7","12"];sLog.clear();sSay("");drawStack();sLog.add("Stack ready with 3 sample items. Top is 12.")}
+$("#sPush").onclick=()=>{const v=readVal($("#sIn"),sSay);if(v===null)return;
+ if(stk.length>=MAXS){sSay("The stack is full ("+MAXS+" items). Pop something first.","warn");sLog.add("Push "+v+" failed: stack is full.","warn");return}
+ stk.push(v);$("#sIn").value="";sSay("Pushed "+v+" onto the top.","info");sLog.add("Push "+v+": placed on top. Size is now "+stk.length+".");drawStack(true)};
+$("#sPop").onclick=async()=>{if(!stk.length){sSay("Nothing to pop: the stack is empty.","warn");sLog.add("Pop failed: stack is empty.","warn");return}
+ const top=$("#stack").firstElementChild;top.classList.add("leave");$("#sPop").disabled=true;await sleep(300);
+ const v=stk.pop();sSay("Popped "+v+" from the top.","info");sLog.add("Pop: removed "+v+" from the top. Size is now "+stk.length+".");drawStack();$("#sPop").disabled=false};
+$("#sPeek").onclick=()=>{if(!stk.length){sSay("Nothing to peek at: the stack is empty.","warn");sLog.add("Peek failed: stack is empty.","warn");return}
+ const v=stk[stk.length-1];drawStack(false,true);sSay("The top item is "+v+" (not removed).","info");sLog.add("Peek: top is "+v+". Stack unchanged.")};
+$("#sReset").onclick=sInit;$("#sIn").onkeydown=e=>{if(e.key==="Enter")$("#sPush").click()};
+
+/* ---------- Queue ---------- */
+const qLog=Log("#qLog"),qSay=Msg("#qMsg"),MAXQ=7;
+let q=[];
+function drawQ(enter){const el=$("#queue");el.innerHTML="";if(!q.length)el.innerHTML='<span class="empty">Empty queue</span>';
+ q.forEach((v,i)=>{const w=document.createElement("div");w.className="qi";const s=document.createElement("small");s.textContent=(i===0?"FRONT":"")+(i===0&&i===q.length-1?" / ":"")+(i===q.length-1?"REAR":"");const d=document.createElement("div");d.className="item";d.textContent=v;if(enter&&i===q.length-1)d.classList.add("enter");w.append(s,d);el.appendChild(w)})}
+function qInit(){q=["A","B","C"];qLog.clear();qSay("");drawQ();qLog.add("Queue ready with 3 sample items. Front is A, rear is C.")}
+$("#qEn").onclick=()=>{const v=readVal($("#qIn"),qSay);if(v===null)return;
+ if(q.length>=MAXQ){qSay("The queue is full ("+MAXQ+" items). Dequeue something first.","warn");qLog.add("Enqueue "+v+" failed: queue is full.","warn");return}
+ q.push(v);$("#qIn").value="";qSay("Enqueued "+v+" at the rear.","info");qLog.add("Enqueue "+v+": joined at the rear. Size is now "+q.length+".");drawQ(true)};
+$("#qDe").onclick=async()=>{if(!q.length){qSay("Nothing to dequeue: the queue is empty.","warn");qLog.add("Dequeue failed: queue is empty.","warn");return}
+ const f=$("#queue").firstElementChild.querySelector(".item");f.classList.add("leave");$("#qDe").disabled=true;await sleep(300);
+ const v=q.shift();qSay("Dequeued "+v+" from the front.","info");qLog.add("Dequeue: removed "+v+" from the front."+(q.length?" New front is "+q[0]+".":" The queue is now empty."));drawQ();$("#qDe").disabled=false};
+$("#qReset").onclick=qInit;$("#qIn").onkeydown=e=>{if(e.key==="Enter")$("#qEn").click()};
+
+/* ---------- Hanoi ---------- */
+const hLog=Log("#hLog"),hSay=Msg("#hMsg"),NAMES=["A","B","C"];
+let pegs,moves,idx,playing=false,run=0;
+function solve(n,a,b,c,out){if(!n)return;solve(n-1,a,c,b,out);out.push([a,c,n]);solve(n-1,b,a,c,out)}
+function drawH(last){const n=+$("#hN").value;const box=$("#pegs");box.innerHTML="";
+ pegs.forEach((p,i)=>{const el=document.createElement("div");el.className="peg";el.setAttribute("role","img");el.setAttribute("aria-label","Peg "+NAMES[i]+": "+(p.length?"disks "+p.join(", ")+" (bottom to top)":"empty"));
+  const lab=document.createElement("b");lab.textContent="Peg "+NAMES[i];el.appendChild(lab);
+  p.forEach(d=>{const k=document.createElement("div");k.className="disk"+(d===last?" moved":"");k.style.width=(28+d/n*68)+"%";k.style.background="hsl("+(d*47%360)+" 75% 68%)";k.textContent=d;el.appendChild(k)});box.appendChild(el)});
+ $("#hCount").textContent=idx;$("#hMin").textContent=moves.length}
+function hInit(){run++;playing=false;const n=+$("#hN").value;pegs=[Array.from({length:n},(_,i)=>n-i),[],[]];moves=[];solve(n,0,1,2,moves);idx=0;
+ $("#hPlay").textContent="Play";hLog.clear();hSay("");drawH();hLog.add("Ready: "+n+" disk"+(n>1?"s":"")+" on peg A. Solving needs "+moves.length+" moves.")}
+function hStep(){if(idx>=moves.length){hSay("Already solved! Press Reset to start again.","info");return false}
+ const[f,t,d]=moves[idx];pegs[f].pop();pegs[t].push(d);idx++;drawH(d);
+ hLog.add("Move "+idx+": disk "+d+" from "+NAMES[f]+" to "+NAMES[t]+".");
+ if(idx===moves.length){hSay("Solved in "+idx+" moves, the minimum possible!","info");hLog.add("Done! The whole tower is on peg C.");return false}return true}
+async function hPlay(){if(playing){playing=false;$("#hPlay").textContent="Play";hSay("Paused.");return}
+ if(idx>=moves.length){hSay("Already solved! Press Reset to start again.","info");return}
+ playing=true;const me=++run;$("#hPlay").textContent="Pause";hSay("");
+ while(playing&&me===run){if(!hStep())break;await sleep(+$("#hSp").value)}
+ if(me===run){playing=false;$("#hPlay").textContent="Play"}}
+$("#hPlay").onclick=hPlay;
+$("#hStep").onclick=()=>{if(playing){hSay("Pause the animation before stepping.","warn");return}hStep()};
+$("#hReset").onclick=hInit;$("#hN").onchange=hInit;
+
+/* ---------- Linked list ---------- */
+const lLog=Log("#lLog"),lSay=Msg("#lMsg"),MAXL=8;
+let L=[],busy=false,els=[];
+function drawL(enterIdx){const el=$("#ll");el.innerHTML="";els=[];
+ if(!L.length){el.innerHTML='<span class="empty">HEAD → </span><span class="null">null</span>';return}
+ L.forEach((v,i)=>{const n=document.createElement("div");n.className="n";
+  const tag=document.createElement("span");tag.className="tag";tag.textContent=(i===0?"HEAD":"")+(i===0&&i===L.length-1?" / ":"")+(i===L.length-1?"TAIL":"");
+  const b=document.createElement("div");b.className="box"+(i===enterIdx?" enter":"");b.textContent=v;n.append(tag,b);el.appendChild(n);els.push(b);
+  const a=document.createElement("span");a.className="arrow";a.setAttribute("aria-hidden","true");a.textContent=i<L.length-1?"→":"→";el.appendChild(a)});
+ const nl=document.createElement("span");nl.className="null";nl.textContent="null";el.appendChild(nl)}
+function lock(b){busy=b;document.querySelectorAll("#p3 button").forEach(x=>x.disabled=b&&x.id!=="lReset")}
+function lInit(){L=["10","20","30"];lLog.clear();lSay("");drawL();lLog.add("List ready: 10 → 20 → 30 → null. HEAD points to 10.")}
+async function walk(v,stopAtMatch){for(let i=0;i<L.length;i++){els[i].classList.add("cur");lLog.add("Visit node "+(i+1)+": value "+L[i]+(L[i]===v?" — match!":" — not "+v+", follow its arrow."));await sleep(550);
+  if(stopAtMatch&&L[i]===v)return i;els[i].classList.remove("cur")}return -1}
+$("#lHead").onclick=()=>{if(busy)return;const v=readVal($("#lIn"),lSay);if(v===null)return;
+ if(L.length>=MAXL){lSay("The list is full ("+MAXL+" nodes). Remove one first.","warn");lLog.add("Add "+v+" failed: list is full.","warn");return}
+ const old=L[0];L.unshift(v);$("#lIn").value="";drawL(0);lSay("Added "+v+" at the head.","info");
+ lLog.add("Add to head: new node "+v+" created. Its next link points to "+(old??"null")+", then HEAD now points to "+v+".")};
+$("#lTail").onclick=async()=>{if(busy)return;const v=readVal($("#lIn"),lSay);if(v===null)return;
+ if(L.length>=MAXL){lSay("The list is full ("+MAXL+" nodes). Remove one first.","warn");lLog.add("Add "+v+" failed: list is full.","warn");return}
+ lock(true);lSay("Walking to the tail…");lLog.add("Add to tail: walk from HEAD to the last node.");
+ for(let i=0;i<L.length;i++){els[i].classList.add("cur");await sleep(400);if(i<L.length-1)els[i].classList.remove("cur")}
+ const last=L[L.length-1];L.push(v);$("#lIn").value="";drawL(L.length-1);
+ lSay("Added "+v+" at the tail.","info");lLog.add(L.length>1&&last!==undefined?"The last node ("+last+") now links to new node "+v+", which points to null.":"List was empty: HEAD now points to "+v+".");lock(false)};
+$("#lFind").onclick=async()=>{if(busy)return;const v=readVal($("#lIn"),lSay);if(v===null)return;
+ if(!L.length){lSay("The list is empty, so there is nothing to search.","warn");lLog.add("Search "+v+" failed: list is empty.","warn");return}
+ lock(true);lSay("Searching for "+v+"…");lLog.add("Search for "+v+": start at HEAD.");const i=await walk(v,true);
+ if(i>=0){els[i].classList.remove("cur");els[i].classList.add("found");lSay("Found "+v+" at position "+(i+1)+".","info");lLog.add("Found "+v+" at position "+(i+1)+".")}
+ else{lSay(v+" is not in the list.","warn");lLog.add("Reached null without finding "+v+".","warn")}
+ await sleep(900);drawL();lock(false)};
+$("#lDel").onclick=async()=>{if(busy)return;const v=readVal($("#lIn"),lSay);if(v===null)return;
+ if(!L.length){lSay("The list is empty, so there is nothing to remove.","warn");lLog.add("Remove "+v+" failed: list is empty.","warn");return}
+ lock(true);lLog.add("Remove "+v+": search from HEAD.");const i=await walk(v,true);
+ if(i<0){lSay(v+" is not in the list, so nothing was removed.","warn");lLog.add("Reached null: "+v+" not found.","warn");drawL();lock(false);return}
+ els[i].classList.remove("cur");els[i].classList.add("gone");await sleep(500);
+ lLog.add(i===0?"Node is the head: HEAD now points to "+(L[1]??"null")+".":"Re-link: node "+L[i-1]+" now points to "+(L[i+1]??"null")+", skipping "+v+".");
+ L.splice(i,1);drawL();lSay("Removed "+v+".","info");lock(false)};
+$("#lReset").onclick=()=>{busy=false;lock(false);lInit()};$("#lIn").onkeydown=e=>{if(e.key==="Enter")$("#lHead").click()};
+
+sInit();qInit();hInit();lInit();
+</script>
+</body>
+</html>
